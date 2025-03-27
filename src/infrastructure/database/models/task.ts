@@ -9,7 +9,7 @@ export enum TaskPriority {
   HIGH = 3,
 }
 
-enum TaskStatus {
+export enum TaskStatus {
   DONE = 'DONE',
   LATE = 'LATE'
 }
@@ -26,7 +26,7 @@ export class Task extends BaseModel {
   completedAt!: Date | null;
   owner!: User;
   collaborators!: User[];
-  status!: string;
+  status!: string | null;
 
   static get jsonSchema() {
     return {
@@ -38,7 +38,7 @@ export class Task extends BaseModel {
         title: { type: "string" },
         description: { type: ["string", "null"] },
         priority: { type: "integer", enum: Object.values(TaskPriority) },
-        status: { type: ["string", "null"], enum: Object.values(TaskStatus) },
+        status: { type: ["string", "null"], enum: [...Object.values(TaskStatus), null] },
         dueDate: { type: ["object", "null"] },
         completedAt: { type: ["object", "null"] }
       },

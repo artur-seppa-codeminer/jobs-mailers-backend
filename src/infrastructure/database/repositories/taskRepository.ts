@@ -1,5 +1,5 @@
 import { Result } from "../../../_lib/result.js";
-import { Task } from "../models/task.js";
+import { Task, TaskStatus } from "../models/task.js";
 import { TaskShare } from "../models/taskShare.js";
 
 export const TaskRepository = {
@@ -15,6 +15,51 @@ export const TaskRepository = {
       const message = error instanceof Error ? error.message : "Database error";
 
       return Result.fail<Task>({ code: "DATABASE_ERROR", message });
+    }
+  },
+
+  async findOpenLateTasks() {
+    try {
+      const now = new Date();
+      const tasks = await Task.query()
+        .whereNull('status')
+        .whereNull('completedAt')
+        .andWhere('dueDate', '<', now)
+        .withGraphFetched('owner')
+        .withGraphFetched('collaborators');
+
+      return Result.succeed(tasks);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Database error";
+      return Result.fail<Task[]>({ code: "DATABASE_ERROR", message });
+    }
+  },
+
+  async findCompletedTasksNotMarkedAsDone() {
+    try {
+      const tasks = await Task.query()
+        .whereNotNull('completedAt')
+        .whereNull('status')
+        .withGraphFetched('owner')
+        .withGraphFetched('collaborators');
+
+      return Result.succeed(tasks);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Database error";
+      return Result.fail<Task[]>({ code: "DATABASE_ERROR", message });
+    }
+  },
+
+  async updateTasksStatus(taskIds: number[], status: string) {
+    try {
+      const updatedCount = await Task.query()
+        .patch({ status })
+        .whereIn('id', taskIds);
+
+      return Result.succeed(updatedCount);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Database error";
+      return Result.fail<number>({ code: "DATABASE_ERROR", message });
     }
   },
 

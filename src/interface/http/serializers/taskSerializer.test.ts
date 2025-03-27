@@ -25,6 +25,7 @@ describe("TaskSerializer", () => {
         completedAt: task.completedAt,
         createdAt: task.createdAt,
         updatedAt: task.updatedAt,
+        status: task.status,
         owner: {
           id: owner.id,
           role: owner.role,
@@ -67,6 +68,7 @@ describe("TaskSerializer", () => {
           completedAt: task.completedAt,
           createdAt: task.createdAt,
           updatedAt: task.updatedAt,
+          status: task.status,
           owner: {
             id: owner.id,
             role: owner.role,
