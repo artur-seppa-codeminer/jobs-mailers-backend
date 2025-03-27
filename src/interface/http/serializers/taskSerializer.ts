@@ -17,6 +17,7 @@ export const TaskSerializer = {
       completedAt: task.completedAt,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
+      status: task.status,
       owner: UserSerializer.serialize(task.owner),
       collaborators: UserSerializer.serializeList(task.collaborators),
     };

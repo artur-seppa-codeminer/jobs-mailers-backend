@@ -53,6 +53,7 @@ const TaskFactory = Factory.define<ModelObject<Task>, never, Task>(
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       owner = UserFactory.build() as any,
       collaborators = [],
+      status = null
     } = params;
 
     return {
@@ -63,6 +64,7 @@ const TaskFactory = Factory.define<ModelObject<Task>, never, Task>(
       priority,
       dueDate,
       completedAt,
+      status,
       createdAt: new Date(),
       updatedAt: new Date(),
       owner,

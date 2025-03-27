@@ -117,6 +117,83 @@ describe("TaskRepository", () => {
     });
   });
 
+  describe("update status", () => {
+    it("find the tasks not marked as done", async () => {
+      const task = await TaskFactory.create({
+        dueDate: new Date(),
+        completedAt: new Date(),
+      });
+
+      const result = await TaskRepository.findCompletedTasksNotMarkedAsDone();
+
+      expect(result).toMatchObject({
+        success: true,
+        data: [task],
+      });
+    });
+
+    it("find the tasks not marked as late", async () => {
+      const task = await TaskFactory.create({
+        dueDate: new Date("2025-03-25T17:43:19.861Z"),
+        createdAt: new Date("2025-03-27T17:43:19.861Z"),
+        updatedAt: new Date("2025-03-27T17:43:32.073Z"),
+        completedAt: null,
+      });
+
+      const result = await TaskRepository.findOpenLateTasks();
+
+      expect(result).toMatchObject({
+        success: true,
+        data: [task],
+      });
+    });
+
+    it("updates the status of a late task", async () => {
+      const task = await TaskFactory.create({
+        dueDate: new Date("2025-03-25T17:43:19.861Z"),
+        createdAt: new Date("2025-03-27T17:43:19.861Z"),
+        updatedAt: new Date("2025-03-27T17:43:32.073Z"),
+        completedAt: null,
+      });
+
+      const lateTasks = await TaskRepository.findOpenLateTasks();
+
+      if (!lateTasks.success) {
+        throw new Error(lateTasks.error.message);
+      }
+
+      const taskId = lateTasks.data[0].id;
+      const result = await TaskRepository.updateTasksStatus([taskId], 'LATE');
+
+      expect(result).toMatchObject({
+        success: true,
+        data: 1
+      });
+    });
+
+    it("updates the status of a done task", async () => {
+      const task = await TaskFactory.create({
+        dueDate: new Date(),
+        completedAt: new Date(),
+      });
+
+      const doneTasks = await TaskRepository.findCompletedTasksNotMarkedAsDone();
+
+      if (!doneTasks.success) {
+        throw new Error(doneTasks.error.message);
+      }
+
+      const taskId = doneTasks.data[0].id;
+      const result = await TaskRepository.updateTasksStatus([taskId], 'LATE');
+
+      expect(result).toMatchObject({
+        success: true,
+        data: 1
+      });
+    });
+
+  });
+
   describe("update", () => {
     it("updates the task", async () => {
       const task = await TaskFactory.create({
